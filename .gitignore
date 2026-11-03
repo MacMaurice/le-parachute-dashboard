@@ -3,3 +3,6 @@
 __pycache__/
 *.tmp
 iap_settings*.yaml
+*.bak
+data/
+.git/

@@ -7,6 +7,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
+import instagram
+
 PARIS = ZoneInfo("Europe/Paris")
 
 STATUTS = ["En attente du stock", "À préparer", "Expédiée", "Remise en main propre"]
@@ -220,7 +222,7 @@ def _doublons(orders: list[dict]) -> None:
 
 
 def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[dict],
-          reglages: dict | None = None) -> dict:
+          reglages: dict | None = None, ig: dict | None = None) -> dict:
     reglages = reglages or {}
     debut = None
     if reglages.get("debut_comptage"):
@@ -378,6 +380,9 @@ def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[
         alertes.append({"niveau": "bad", "texte": f"Le versement du {_fr(f['date'])} a échoué : vérifie ton RIB dans Stripe."})
     for w in snap.get("warnings") or []:
         alertes.append({"niveau": "warn", "texte": w})
+    insta = instagram.section(ig, sessions, actives) if ig is not None else None
+    if insta and insta["alerte"] and insta["derniere_collecte"]:
+        alertes.append({"niveau": "warn", "texte": insta["alerte"]})
 
     return {
         "maj": datetime.fromtimestamp(snap.get("fetched_at") or 0, PARIS).isoformat(),
@@ -430,6 +435,7 @@ def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[
         "contestations": contestations,
         "depenses": sorted(depenses, key=lambda d: str(d.get("date") or ""), reverse=True),
         "alertes": alertes,
+        "instagram": insta,
         "referentiels": {
             "statuts": STATUTS,
             "types_mouvement": TYPES_MOUVEMENT,

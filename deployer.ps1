@@ -105,6 +105,13 @@ $code = $LASTEXITCODE
 Remove-Item env.tmp.yaml -Force
 if ($code -ne 0) { Write-Host "Le déploiement a échoué (voir le message ci-dessus)." -ForegroundColor Red; exit 1 }
 
+# La collecte Instagram tourne sur la même image : on la met à jour en même temps.
+if (Existe run jobs describe collecte-instagram "--region=$Region") {
+  $img = (& gcloud run services describe $Service "--region=$Region" '--format=value(spec.template.spec.containers[0].image)')
+  G run jobs update collecte-instagram "--region=$Region" "--image=$img" --quiet --format=none
+  Write-Host "Collecte Instagram mise à jour sur la nouvelle image."
+}
+
 Etape "Images Docker : ne garder que les 2 dernières (rester sous les 0,5 Go gratuits)"
 Ecrire-SansBom "nettoyage.tmp.json" '[{"name":"garder-2-dernieres","action":{"type":"Keep"},"mostRecentVersions":{"keepCount":2}},{"name":"supprimer-le-reste","action":{"type":"Delete"},"condition":{"tagState":"any"}}]'
 & gcloud artifacts repositories set-cleanup-policies cloud-run-source-deploy "--location=$Region" --policy=nettoyage.tmp.json --no-dry-run --format=none

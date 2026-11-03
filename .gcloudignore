@@ -10,3 +10,9 @@ __pycache__/
 deployer.ps1
 iap_settings*.yaml
 LISEZ-MOI*.md
+tests/
+installer-instagram.ps1
+.git/
+.gitignore
+*.bak
+CLAUDE.md

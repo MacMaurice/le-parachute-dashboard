@@ -4,16 +4,18 @@ from __future__ import annotations
 import csv
 import io
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import instagram
 import metrics
 from store import Store
 from stripe_client import StripeClient, StripeError
@@ -54,12 +56,23 @@ def index():
 def _dashboard(refresh: bool = False) -> dict:
     snap = stripe().snapshot(force=refresh)
     return metrics.build(snap, store.read("mouvements"), store.read("suivi"), store.read("depenses"),
-                         store.read_settings())
+                         store.read_settings(), instagram.lire(store))
 
 
 @app.get("/api/dashboard")
 def dashboard(refresh: bool = False):
     return _dashboard(refresh)
+
+
+# --- Visuels Instagram (copiés dans le bucket par la collecte) -----------------
+@app.get("/api/instagram/media/{media_id}", include_in_schema=False)
+def instagram_media(media_id: str):
+    if not re.fullmatch(r"[A-Za-z0-9_]{1,40}", media_id):
+        raise HTTPException(404, "Visuel introuvable")
+    data = store.files.read_bytes(f"instagram_media/{media_id}.jpg")
+    if data is None:
+        raise HTTPException(404, "Visuel introuvable")
+    return Response(data, media_type="image/jpeg", headers={"Cache-Control": "private, max-age=86400"})
 
 
 # --- Réglages (filtre des consultations internes du lien de paiement) ---------

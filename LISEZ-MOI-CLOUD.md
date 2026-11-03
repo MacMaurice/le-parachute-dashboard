@@ -67,7 +67,7 @@ client OAuth. Dans le projet, menu **Google Auth Platform** (ou API et services 
 Dans PowerShell :
 
 ```
-cd "C:\Users\Hugo\OneDrive\Documents\Magouilles Politiciennes\Le Parachuté\7 - Commercialisation\dashboard-ventes (cloud run)"
+cd "C:\Users\Hugo\OneDrive\Documents\Magouilles Politiciennes\Le Parachuté\7 - Commercialisation\dashboard-ventes"
 powershell -ExecutionPolicy Bypass -File .\deployer.ps1 -Projet ID_DU_PROJET -Emails hugomaurice14@gmail.com,leparachute37@gmail.com,adresse-du-frere@gmail.com
 ```
 

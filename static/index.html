@@ -19,6 +19,7 @@
       <a href="#commandes" role="tab" data-tab="commandes">Commandes <span class="tab-count" id="tab-count-cmd"></span></a>
       <a href="#stock" role="tab" data-tab="stock">Stock</a>
       <a href="#finances" role="tab" data-tab="finances">Finances</a>
+      <a href="#instagram" role="tab" data-tab="instagram">Instagram</a>
     </nav>
     <div class="top-actions">
       <span class="pill" id="link-pill" hidden></span>
@@ -262,6 +263,67 @@
         </div>
       </article>
     </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section id="instagram" class="page" data-page="instagram" hidden>
+    <div id="ig-alerte" class="banner warn" hidden></div>
+    <div class="ig-profil" id="ig-profil" hidden></div>
+    <div class="tiles">
+      <article class="tile tile-main"><h3>Abonnés</h3><p class="big" id="ig-abonnes">—</p><p class="sub" id="ig-abonnes-7j">—</p></article>
+      <article class="tile"><h3>Portée</h3><p class="big" id="ig-portee">—</p><p class="sub">comptes touchés, 7 derniers jours</p></article>
+      <article class="tile"><h3>Interactions</h3><p class="big" id="ig-inter">—</p><p class="sub">j'aime, commentaires, partages, enregistrements (7 j)</p></article>
+      <article class="tile"><h3>Clics vers le lien du profil</h3><p class="big" id="ig-clics">—</p><p class="sub">7 derniers jours</p></article>
+      <article class="tile"><h3>Clients venus d'Instagram</h3><p class="big" id="ig-clients">—</p><p class="sub" id="ig-clients-sub">—</p></article>
+    </div>
+
+    <article class="card">
+      <header class="card-h">
+        <h2>Instagram et ventes, jour par jour</h2>
+        <p class="note">Les traits pointillés marquent les publications. En haut, les comptes touchés sur Instagram ; en bas, les ouvertures du lien de paiement et les jeux commandés le même jour.</p>
+      </header>
+      <div class="chart ig-chart" id="chart-ig-portee"></div>
+      <div class="chart ig-chart" id="chart-ig-ventes"></div>
+      <ul class="legend" id="ig-legend"></ul>
+    </article>
+
+    <article class="card flush">
+      <header class="card-h pad">
+        <h2>Effet de chaque publication</h2>
+        <p class="note" id="ig-note-effet">Ce qui se passe sur le lien de paiement dans les 48 h qui suivent la publication, comparé à 48 h moyennes. Une corrélation, pas une preuve : un bouche-à-oreille ou un autre post peut tomber dans la même fenêtre.</p>
+      </header>
+      <div class="table-wrap">
+        <table class="tbl" id="tbl-ig">
+          <thead><tr><th>Date</th><th>Publication</th><th class="num">Portée</th><th class="num">Ouvertures du lien (48 h)</th><th class="num">Jeux commandés (48 h)</th><th class="num hide-sm">Interactions</th><th class="num hide-sm">Engagement</th><th class="num hide-sm">Partages</th><th class="num hide-sm">Enregistr.</th><th class="num hide-sm">Abonnés gagnés</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+    <div class="grid2">
+      <article class="card">
+        <header class="card-h">
+          <h2>Qui sont tes abonnés</h2>
+          <p class="note" id="ig-aud-note">Répartition fournie par Instagram (à partir de 100 abonnés).</p>
+        </header>
+        <div class="ig-aud" id="ig-audience"></div>
+      </article>
+      <article class="card">
+        <header class="card-h">
+          <h2>Quand tes abonnés sont en ligne</h2>
+          <p class="note">Moyenne des 30 derniers jours, heure de Paris. Plus la case est foncée, plus ils sont nombreux : le bon moment pour publier.</p>
+        </header>
+        <div class="ig-heat" id="ig-heures"></div>
+      </article>
+    </div>
+
+    <article class="card">
+      <header class="card-h">
+        <h2>Commentaires <span class="tab-count" id="ig-com-count"></span></h2>
+        <p class="note">Les plus récents d'abord. Instagram ne donne pas qui a aimé, partagé ou enregistré, seulement les nombres.</p>
+      </header>
+      <ul class="ig-coms" id="ig-commentaires"></ul>
+    </article>
+    <p class="hint" id="ig-maj">&nbsp;</p>
   </section>
 </main>
 

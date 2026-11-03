@@ -126,6 +126,7 @@
     renderVersements();
     renderRentab(k);
     renderContestations();
+    renderInsta();
     fillSelects();
   }
 
@@ -495,6 +496,176 @@
     }, () => { $("#dep-note").value = ""; $("#dep-montant").value = ""; });
   });
 
+  // ---------- Instagram ----------
+  const fmtN = (v) => (v == null ? "—" : nf.format(v));
+  function renderInsta() {
+    const ig = state.data && state.data.instagram;
+    const al = $("#ig-alerte");
+    if (!ig) { al.textContent = "Instagram n'est pas encore relié au dashboard."; al.hidden = false; return; }
+    const k = ig.kpis;
+    al.hidden = !ig.alerte; al.textContent = ig.alerte || "";
+    $("#ig-abonnes").textContent = fmtN(k.abonnes);
+    $("#ig-abonnes-7j").textContent = k.abonnes_7j == null ? (ig.compte ? `@${ig.compte}` : "—")
+      : `${k.abonnes_7j >= 0 ? "+" : ""}${nf.format(k.abonnes_7j)} en 7 jours`;
+    $("#ig-portee").textContent = fmtN(k.portee_7j);
+    $("#ig-inter").textContent = fmtN(k.interactions_7j);
+    $("#ig-clics").textContent = fmtN(k.clics_profil_7j);
+    $("#ig-clients").textContent = nf.format(k.clients_instagram);
+    $("#ig-clients-sub").textContent = k.clients_source_connue
+      ? `${pct.format(k.clients_instagram / k.clients_source_connue)} des ${plural(k.clients_source_connue, "commande", "commandes")} où le client a répondu`
+      : "selon « Comment avez-vous connu le jeu ? »";
+    renderIgProfil(ig);
+    renderIgCharts(ig);
+    renderIgPosts(ig);
+    renderIgAudience(ig);
+    renderIgHeures(ig);
+    renderIgCommentaires(ig);
+    const maj = ig.derniere_collecte ? new Date(ig.derniere_collecte) : null;
+    $("#ig-maj").textContent = maj ? `Instagram collecté le ${dLong.format(maj)} à ${tHM.format(maj)} (deux fois par jour, vers 11 h et 23 h). Les chiffres récents se complètent dans les 48 h.`
+      : "La collecte Instagram tourne deux fois par jour, vers 11 h et 23 h.";
+  }
+
+  function renderIgCharts(ig) {
+    const jours = ig.jours, n = jours.length;
+    const postsParId = Object.fromEntries(ig.posts.map((p) => [p.id, p]));
+    const W = Math.max($("#chart-ig-portee").clientWidth, 300), m = { t: 22, r: 12, b: 8, l: 38 };
+    const iw = W - m.l - m.r, bw = iw / n, x = (i) => m.l + i * bw;
+    const draw = (sel, H, titre, max, bars, extra, bas) => {
+      const box = $(sel); box.replaceChildren();
+      const ih = H - m.t - (bas ? 26 : m.b);
+      const step = niceStep(max, 3), top = Math.max(step, Math.ceil(max / step) * step);
+      const y = (v) => m.t + ih - (v / top) * ih;
+      const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": titre });
+      const t = s("text", { class: "ch-title", x: m.l, y: 12 }); t.textContent = titre; svg.append(t);
+      const grid = s("g", { class: "grid" });
+      for (let v = 0; v <= top + 1e-9; v += step) {
+        grid.append(s("line", { x1: m.l, x2: W - m.r, y1: y(v), y2: y(v) }));
+        const tx = s("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }); tx.textContent = nf.format(v); grid.append(tx);
+      }
+      svg.append(grid);
+      jours.forEach((j, i) => { if (j.posts.length) svg.append(s("line", { class: "post-mark", x1: x(i) + bw / 2, x2: x(i) + bw / 2, y1: m.t - 4, y2: m.t + ih })); });
+      bars.forEach(([cls, key]) => jours.forEach((j, i) => {
+        const v = j[key]; if (!v) return;
+        const hgt = Math.max(2, y(0) - y(v)), w = Math.max(2, bw - 2);
+        svg.append(s("path", { class: cls, d: `M${x(i) + 1},${y(0)}v${-hgt + 2}q0,-2 2,-2h${w - 4}q2,0 2,2v${hgt - 2}z` }));
+      }));
+      if (extra) extra(svg, y);
+      if (bas) {
+        const nT = Math.min(n, Math.max(2, Math.floor(iw / 80)));
+        [...new Set(Array.from({ length: nT }, (_, i) => Math.round((i * (n - 1)) / (nT - 1))))].forEach((i) => {
+          const tx = s("text", { x: x(i) + bw / 2, y: H - 6, "text-anchor": i === n - 1 ? "end" : i === 0 ? "start" : "middle" }); tx.textContent = fmtDay(jours[i].jour); svg.append(tx);
+        });
+      }
+      jours.forEach((j, i) => {
+        const hit = s("rect", { class: "col-hit", x: x(i), y: m.t, width: bw, height: ih });
+        hit.addEventListener("mousemove", (e) => showTip(e, fmtDay(j.jour, true), [
+          [cssVar("--c4"), "Portée Instagram", fmtN(j.portee)],
+          ...(j.portee_non_abonnes != null ? [[null, "dont non-abonnés", fmtN(j.portee_non_abonnes)]] : []),
+          [null, "Nouveaux abonnés", fmtN(j.abonnements ?? j.nouveaux_abonnes)],
+          ...(j.desabonnements != null ? [[null, "Désabonnements", fmtN(j.desabonnements)]] : []),
+          [null, "Clics vers le lien du profil", fmtN(j.clics_profil)],
+          [cssVar("--c1"), "Ouvertures du lien de paiement", nf.format(j.ouvertures)],
+          [cssVar("--c2"), "Jeux commandés", nf.format(j.jeux)],
+          ...j.posts.map((id) => [null, "Publication", (postsParId[id] && postsParId[id].legende || "").slice(0, 40) || "sans légende"])]));
+        hit.addEventListener("mouseleave", hideTip);
+        svg.append(hit);
+      });
+      box.append(svg);
+    };
+    draw("#chart-ig-portee", 150, "Comptes touchés sur Instagram", Math.max(1, ...jours.map((j) => j.portee || 0)), [["bar-portee", "portee"]]);
+    draw("#chart-ig-ventes", 176, "Lien de paiement", Math.max(1, ...jours.map((j) => Math.max(j.ouvertures, j.jeux))), [["bar-ouv", "ouvertures"]],
+      (svg, y) => jours.forEach((j, i) => { if (j.jeux) svg.append(s("circle", { class: "dot-jeux", cx: x(i) + bw / 2, cy: y(j.jeux), r: Math.max(4, Math.min(5, bw / 2)) })); }), true);
+    $("#ig-legend").replaceChildren(
+      h("li", {}, h("i", { style: "background:var(--c4)" }), "Comptes touchés sur Instagram"),
+      h("li", {}, h("i", { style: "background:var(--c1)" }), "Ouvertures du lien de paiement"),
+      h("li", {}, h("i", { style: "background:var(--c2);border-radius:50%" }), "Jeux commandés"),
+      h("li", {}, h("i", { style: "background:none;border-left:1px dashed var(--muted);border-radius:0;width:6px" }), "Publication"));
+  }
+
+  function renderIgPosts(ig) {
+    const base = ig.base_48h;
+    const vs = (v, b) => {
+      if (b == null) return null;
+      const r = b ? v / b : null;
+      return h("span", { class: `vs${r != null && r >= 1.5 ? " up" : ""}` }, `moyenne ${nf.format(Math.round(b * 10) / 10)}`);
+    };
+    const rows = ig.posts.map((p) => {
+      const e = p.effet;
+      const type = p.type === "STORY" ? "Story" : p.type === "REELS" ? "Reel" : p.format === "CAROUSEL_ALBUM" ? "Carrousel" : "Post";
+      const effetCell = (cle, b) => !e ? h("td", { class: "num", title: "Publiée avant l'ouverture des ventes" }, "—")
+        : h("td", { class: "num" }, nf.format(e[cle]), e.complet ? null : h("span", { class: "vs" }, "en cours"), vs(e[cle], b));
+      return h("tr", {},
+        h("td", { class: "nw" }, fmtDay(p.date, true), h("span", { class: "vs" }, tHM.format(new Date(p.date)))),
+        h("td", {}, h("div", { class: "ig-leg" }, vignette(p.id, "thumb"),
+          h("div", {}, p.lien ? h("a", { href: p.lien, target: "_blank", rel: "noopener" }, type) : type,
+            p.audio === "MUSIC" ? " avec musique" : "",
+            h("small", { title: p.legende_complete || "" }, p.legende || "")))),
+        h("td", { class: "num" }, fmtN(p.reach)),
+        effetCell("ouvertures", base && base.ouvertures),
+        effetCell("jeux", base && base.commandes),
+        h("td", { class: "num hide-sm" }, fmtN(p.total_interactions)),
+        h("td", { class: "num hide-sm" }, p.engagement == null ? "—" : pct.format(p.engagement)),
+        h("td", { class: "num hide-sm" }, fmtN(p.shares)),
+        h("td", { class: "num hide-sm" }, fmtN(p.saved)),
+        h("td", { class: "num hide-sm" }, fmtN(p.follows)));
+    });
+    $("#tbl-ig tbody").replaceChildren(...(rows.length ? rows : emptyRow(10, "Aucune publication collectée pour l'instant.")));
+  }
+
+  // Visuel copié dans le bucket par la collecte ; masqué s'il n'existe pas (encore)
+  const vignette = (id, cls) => h("img", { class: cls, src: `/api/instagram/media/${encodeURIComponent(id)}`, alt: "", loading: "lazy",
+    onerror: (e) => { e.target.style.visibility = "hidden"; } });
+
+  function renderIgProfil(ig) {
+    const box = $("#ig-profil"), pr = ig.profil || {};
+    box.hidden = !ig.compte;
+    if (!ig.compte) return;
+    box.replaceChildren(...[pr.photo ? vignette("profil") : null,
+      h("div", {}, h("b", {}, `@${ig.compte}`), pr.name ? `, ${pr.name}` : "", pr.biography ? h("p", {}, pr.biography) : null)].filter(Boolean));
+  }
+
+  function renderIgAudience(ig) {
+    const box = $("#ig-audience"), a = ig.audience && (ig.audience.abonnes || ig.audience.engages);
+    if (!a) { box.replaceChildren(h("p", { class: "none" }, "Instagram ne donne la répartition qu'à partir de 100 abonnés.")); return; }
+    $("#ig-aud-note").textContent = ig.audience.abonnes ? "Répartition de tes abonnés fournie par Instagram." : "Répartition des comptes qui ont interagi ce mois-ci (celle des abonnés n'est pas encore disponible).";
+    const blocs = [["Âge", "age"], ["Genre", "genre"], ["Villes", "villes"], ["Pays", "pays"]];
+    box.replaceChildren(...blocs.filter(([, k]) => (a[k] || []).length).map(([t, k], i) => h("div", {}, h("h3", {}, t), h("div", { class: "hbars", id: `ig-aud-${i}` }))));
+    blocs.forEach(([, k], i) => { if ((a[k] || []).length) renderBars(`#ig-aud-${i}`, a[k], ""); });
+  }
+
+  function renderIgHeures(ig) {
+    const box = $("#ig-heures"), m = ig.heures || {};
+    const vals = Object.values(m);
+    if (!vals.length) { box.replaceChildren(h("p", { class: "none", style: "grid-column:1/-1" }, "Disponible à partir de 100 abonnés, après la première collecte.")); return; }
+    const max = Math.max(...vals), jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"], cells = [h("span", {})];
+    for (let hr = 0; hr < 24; hr++) cells.push(h("span", { class: "h" }, hr % 3 === 0 ? `${hr}h` : ""));
+    jours.forEach((j, d) => {
+      cells.push(h("span", { class: "l" }, j));
+      for (let hr = 0; hr < 24; hr++) {
+        const v = m[`${d}-${hr}`];
+        const c = h("span", { class: `c${v == null ? " vide" : ""}`, style: v == null ? "" : `opacity:${(0.12 + 0.88 * v / max).toFixed(2)}` });
+        c.addEventListener("mousemove", (e) => showTip(e, `${["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"][d]} ${hr} h`, [[null, "Abonnés en ligne (moyenne)", v == null ? "—" : nf.format(v)]]));
+        c.addEventListener("mouseleave", hideTip);
+        cells.push(c);
+      }
+    });
+    box.replaceChildren(...cells);
+  }
+
+  function renderIgCommentaires(ig) {
+    const coms = ig.commentaires || [];
+    $("#ig-com-count").textContent = ig.commentaires_sans_reponse ? `${nf.format(ig.commentaires_sans_reponse)} sans réponse` : "";
+    $("#ig-com-count").classList.toggle("warn", ig.commentaires_sans_reponse > 0);
+    $("#ig-commentaires").replaceChildren(...(coms.length ? coms.map((c) => h("li", {}, vignette(c.post, "thumb"),
+      h("div", {},
+        h("p", {}, h("b", {}, c.pseudo), " ", c.texte),
+        h("small", {}, c.date ? `${fmtDay(c.date, true)} à ${tHM.format(new Date(c.date))}` : "", c.likes ? `, ${plural(c.likes, "j'aime", "j'aime")}` : "",
+          c.masque ? ", masqué" : "", ", ", c.post_lien ? h("a", { href: c.post_lien, target: "_blank", rel: "noopener" }, "voir le post") : "",
+          !c.repondu && c.pseudo !== ig.compte ? h("span", { class: "attente" }, ", sans réponse") : ""),
+        ...c.reponses.map((r) => h("div", { class: "rep" }, h("b", {}, r.pseudo), " ", r.texte)))))
+      : [h("li", { class: "none" }, "Aucun commentaire collecté pour l'instant.")]));
+  }
+
   // ---------- Onglets ----------
   function showTab() {
     const name = (location.hash || "#apercu").slice(1);
@@ -502,12 +673,13 @@
     $$(".page").forEach((p) => (p.hidden = p.dataset.page !== tab));
     $$(".tabs a").forEach((a) => a.setAttribute("aria-selected", String(a.dataset.tab === tab)));
     if (tab === "apercu" && state.data) renderVentes(state.data.serie);
+    if (tab === "instagram" && state.data && state.data.instagram) renderIgCharts(state.data.instagram);
   }
   // Les onglets sont des ancres (#apercu…) : le navigateur descendrait jusqu'à la section
   // et cacherait les alertes du haut. On reste en haut de page.
   addEventListener("hashchange", () => { showTab(); scrollTo(0, 0); });
   let rt;
-  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => state.data && renderVentes(state.data.serie), 150); });
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!state.data) return; renderVentes(state.data.serie); if (state.data.instagram) renderIgCharts(state.data.instagram); }, 150); });
 
   $("#refresh").addEventListener("click", () => load(true));
   showTab();

@@ -43,6 +43,18 @@ class LocalFiles:
         tmp.write_text(text, encoding="utf-8")
         os.replace(tmp, path)
 
+    def read_bytes(self, name: str) -> bytes | None:
+        path = self.dir / name
+        return path.read_bytes() if path.exists() else None
+
+    def write_bytes(self, name: str, data: bytes, content_type: str = "") -> None:
+        path = self.dir / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    def exists(self, name: str) -> bool:
+        return (self.dir / name).exists()
+
 
 class GcsFiles:
     """Fichiers JSON dans un bucket Cloud Storage (chaque écriture remplace l'objet en entier)."""
@@ -70,6 +82,20 @@ class GcsFiles:
         self.bucket.blob(self.prefix + name).upload_from_string(
             text.encode("utf-8"), content_type="application/json; charset=utf-8")
 
+    def read_bytes(self, name: str) -> bytes | None:
+        try:
+            return self.bucket.blob(self.prefix + name).download_as_bytes()
+        except Exception as exc:
+            if exc.__class__.__name__ == "NotFound":
+                return None
+            raise
+
+    def write_bytes(self, name: str, data: bytes, content_type: str = "") -> None:
+        self.bucket.blob(self.prefix + name).upload_from_string(data, content_type=content_type or None)
+
+    def exists(self, name: str) -> bool:
+        return self.bucket.blob(self.prefix + name).exists()
+
 
 # --- Store -------------------------------------------------------------------
 def _dump(data: Any) -> str:
@@ -95,6 +121,15 @@ class Store:
         text = (self.files.read_text(name) or "").strip()
         data = json.loads(text) if text else empty
         return data if isinstance(data, type(empty)) else empty
+
+    def read_json(self, name: str, empty: Any) -> Any:
+        """Lecture d'un fichier JSON quelconque du stockage (ex. instagram_posts.json)."""
+        with self._lock:
+            return self._read_json(name, empty)
+
+    def write_json(self, name: str, data: Any) -> None:
+        with self._lock:
+            self.files.write_text(name, _dump(data))
 
     def read(self, kind: str) -> list[dict[str, Any]]:
         with self._lock:
