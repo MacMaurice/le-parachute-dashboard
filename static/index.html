@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventes du Parachuté</title>
+<link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <img src="/static/img/logo.svg" alt="Le Parachuté" class="logo">
+      <span class="brand-tag">Commercialisation</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <a href="#apercu" role="tab" data-tab="apercu">Vue d'ensemble</a>
+      <a href="#commandes" role="tab" data-tab="commandes">Commandes <span class="tab-count" id="tab-count-cmd"></span></a>
+      <a href="#stock" role="tab" data-tab="stock">Stock</a>
+      <a href="#finances" role="tab" data-tab="finances">Finances</a>
+    </nav>
+    <div class="top-actions">
+      <span class="pill" id="link-pill" hidden></span>
+      <span class="maj" id="maj">Chargement…</span>
+      <button class="btn ghost" id="refresh" type="button" title="Relire Stripe maintenant">Rafraîchir</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="error" class="banner bad" hidden></div>
+  <ul id="alertes" class="alertes"></ul>
+
+  <!-- VUE D'ENSEMBLE -->
+  <section id="apercu" class="page" data-page="apercu">
+    <p class="lede" id="lede">&nbsp;</p>
+
+    <div class="tiles">
+      <article class="tile tile-main">
+        <h3>Jeux vendus</h3>
+        <p class="big" data-k="jeux_vendus">—</p>
+        <p class="sub"><span data-k="part_tirage">—</span> du tirage</p><p class="sub"><span data-k="vendus_en_ligne">—</span> en ligne, <span data-k="vendus_direct">—</span> en direct</p>
+      </article>
+      <article class="tile">
+        <h3>Chiffre d'affaires</h3>
+        <p class="big" data-k="ca" data-fmt="eur">—</p>
+        <p class="sub">dont <span data-k="port" data-fmt="eur">—</span> de port</p><p class="sub">panier moyen <span data-k="panier_moyen" data-fmt="eur">—</span></p>
+      </article>
+      <article class="tile">
+        <h3>Jeux à livrer</h3>
+        <p class="big" data-k="a_livrer">—</p>
+        <p class="sub"><span data-k="a_preparer">—</span> à préparer</p><p class="sub"><span data-k="livres">—</span> déjà livrés</p>
+      </article>
+      <article class="tile">
+        <h3>Disponibles à la vente</h3>
+        <p class="big" data-k="disponibles">—</p>
+        <p class="sub">sur un tirage de <span data-k="tirage">—</span></p><p class="sub"><span data-k="recus">—</span> reçus, <span data-k="en_route">—</span> en route</p>
+      </article>
+      <article class="tile">
+        <h3>Clients</h3>
+        <p class="big" data-k="clients">—</p>
+        <p class="sub" id="k-cmd">—</p><p class="sub">conversion du lien <span id="k-conv">—</span></p>
+      </article>
+    </div>
+
+    <article class="card">
+      <header class="card-h">
+        <h2>Où en est le tirage</h2>
+        <p class="note">Chaque jeu du tirage, de la vente à la livraison.</p>
+      </header>
+      <div class="gauge" id="gauge"></div>
+      <ul class="legend" id="gauge-legend"></ul>
+    </article>
+
+    <div class="grid2">
+      <article class="card">
+        <header class="card-h">
+          <h2>Ventes cumulées</h2>
+          <p class="note">Jeux vendus depuis l'ouverture des précommandes, en ligne et en direct.</p>
+        </header>
+        <div class="chart" id="chart-ventes"></div>
+      </article>
+      <article class="card">
+        <header class="card-h">
+          <h2>Lien de paiement</h2>
+          <p class="note">Ouvertures de la page de paiement Stripe, sans vos propres consultations.</p>
+        </header>
+        <div class="funnel" id="funnel"></div>
+        <details class="filtre">
+          <summary>Exclure vos consultations <span id="f-masquees"></span></summary>
+          <div class="filtre-body">
+            <p class="note">Pour tester le paiement sans fausser les chiffres, passez par ce lien : il n'est jamais compté.</p>
+            <div class="copy"><code id="f-lien">—</code><button class="btn" id="f-copy" type="button">Copier</button></div>
+            <div class="form">
+              <label class="full">Ne compter qu'à partir du (ex. heure du post Instagram)<input type="datetime-local" id="f-debut"></label>
+              <label class="full">E-mails internes, séparés par des virgules<input type="text" id="f-emails" placeholder="vous@exemple.fr, frere@exemple.fr"></label>
+              <p class="form-err" id="f-err" hidden></p>
+              <button class="btn primary" id="f-save" type="button">Enregistrer le filtre</button>
+            </div>
+          </div>
+        </details>
+      </article>
+    </div>
+
+    <div class="grid2">
+      <article class="card">
+        <header class="card-h">
+          <h2>Mode de livraison</h2>
+          <p class="note">Jeux vendus en ligne, par mode choisi au paiement.</p>
+        </header>
+        <div class="hbars" id="bars-livraison"></div>
+      </article>
+      <article class="card">
+        <header class="card-h">
+          <h2>Comment ils ont connu le jeu</h2>
+          <p class="note">Réponse facultative sur la page de paiement, par commande.</p>
+        </header>
+        <div class="hbars" id="bars-sources"></div>
+      </article>
+    </div>
+
+    <article class="card">
+      <header class="card-h">
+        <h2>Un mot pour les auteurs</h2>
+        <p class="note">Ce que les clients vous ont écrit en commandant.</p>
+      </header>
+      <div class="mots" id="mots"></div>
+    </article>
+  </section>
+
+  <!-- COMMANDES -->
+  <section id="commandes" class="page" data-page="commandes" hidden>
+    <div class="toolbar">
+      <div class="chips" id="chips-statut"></div>
+      <input type="search" id="search" placeholder="Rechercher un client, une ville…" aria-label="Rechercher">
+      <a class="btn" href="/api/commandes.csv" id="export">Exporter en CSV</a>
+    </div>
+    <article class="card flush">
+      <div class="table-wrap">
+        <table class="tbl" id="tbl-commandes">
+          <thead><tr>
+            <th data-sort="date">Date</th><th data-sort="client">Client</th><th data-sort="ville" class="hide-sm">Ville</th>
+            <th data-sort="quantite" class="num">Qté</th><th data-sort="livraison" class="hide-sm">Livraison</th>
+            <th data-sort="montant" class="num">Montant</th><th data-sort="statut">Statut</th>
+            <th class="hide-sm">N° de suivi</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="empty" id="cmd-empty" hidden>Aucune commande ne correspond.</p>
+    </article>
+    <p class="hint">Clique sur une commande pour voir l'adresse, le téléphone et le mot du client. Le statut et le numéro de suivi s'enregistrent tout seuls.</p>
+  </section>
+
+  <!-- STOCK -->
+  <section id="stock" class="page" data-page="stock" hidden>
+    <div class="tiles">
+      <article class="tile"><h3>Tirage</h3><p class="big" data-k="tirage">—</p><p class="sub">jeux commandés à l'imprimeur</p></article>
+      <article class="tile"><h3>Reçus</h3><p class="big" data-k="recus">—</p><p class="sub"><span data-k="en_route">—</span> encore en route depuis l'imprimeur</p></article>
+      <article class="tile"><h3>Stock physique</h3><p class="big" data-k="stock_physique">—</p><p class="sub">jeux chez vous en ce moment</p></article>
+      <article class="tile"><h3>Disponibles à la vente</h3><p class="big" data-k="disponibles">—</p><p class="sub">tirage moins vendus, offerts, abîmés</p></article>
+      <article class="tile"><h3>Offerts</h3><p class="big" data-k="offerts">—</p><p class="sub"><span data-k="casse">—</span> abîmés ou perdus</p></article>
+    </div>
+
+    <div class="grid-side">
+      <article class="card">
+        <header class="card-h"><h2>Ajouter un mouvement</h2>
+          <p class="note">Réception de cartons, vente en direct (salon, espèces), jeu offert…</p></header>
+        <div class="form" id="form-mvt">
+          <label>Date<input type="date" id="mvt-date" required></label>
+          <label>Type<select id="mvt-type"></select></label>
+          <label>Quantité<input type="number" id="mvt-qte" step="1" value="1"></label>
+          <label id="mvt-montant-wrap">Montant encaissé (€)<input type="number" id="mvt-montant" step="0.01" min="0"></label>
+          <label class="full">Note<input type="text" id="mvt-note" placeholder="Ex. salon de Meaux, carton n°3…"></label>
+          <p class="form-err" id="mvt-err" hidden></p>
+          <button class="btn primary" type="button" id="mvt-add">Ajouter au journal</button>
+        </div>
+      </article>
+      <article class="card flush">
+        <header class="card-h pad"><h2>Journal du stock</h2></header>
+        <div class="table-wrap">
+          <table class="tbl" id="tbl-mvt">
+            <thead><tr><th>Date</th><th>Type</th><th class="num">Qté</th><th class="num hide-sm">Montant</th><th class="hide-sm">Note</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- FINANCES -->
+  <section id="finances" class="page" data-page="finances" hidden>
+    <div class="tiles">
+      <article class="tile"><h3>Chiffre d'affaires</h3><p class="big" data-k="ca" data-fmt="eur">—</p>
+        <p class="sub"><span data-k="ca_en_ligne" data-fmt="eur">—</span> en ligne</p><p class="sub"><span data-k="ca_direct" data-fmt="eur">—</span> en direct</p></article>
+      <article class="tile"><h3>Frais Stripe</h3><p class="big" data-k="frais_stripe" data-fmt="eur">—</p><p class="sub">commissions et Radar</p></article>
+      <article class="tile"><h3>Dépenses</h3><p class="big" data-k="depenses" data-fmt="eur">—</p><p class="sub">dont <span data-k="depenses_a_payer" data-fmt="eur">—</span> à payer</p></article>
+      <article class="tile"><h3>Résultat</h3><p class="big" data-k="resultat" data-fmt="eur" data-sign="1">—</p><p class="sub">CA − frais Stripe − dépenses, payées ou à payer</p></article>
+      <article class="tile"><h3>Solde Stripe</h3><p class="big" data-k="solde_disponible" data-fmt="eur">—</p><p class="sub">+ <span data-k="solde_en_attente" data-fmt="eur">—</span> en attente chez Stripe</p></article>
+      <article class="tile"><h3>Versé sur ton compte</h3><p class="big" data-k="verse" data-fmt="eur">—</p><p class="sub">+ <span data-k="verse_en_cours" data-fmt="eur">—</span> en cours de virement</p></article>
+    </div>
+
+    <article class="card" id="rentab">
+      <header class="card-h">
+        <h2>Rentabilité</h2>
+        <p class="note">Combien de jeux vendre pour couvrir toutes les dépenses saisies, au prix moyen constaté hors frais de port et avant frais Stripe.</p>
+      </header>
+      <p class="rentab-txt" id="rentab-txt">—</p>
+      <div class="gauge rentab-gauge" id="rentab-gauge"></div>
+      <ul class="legend">
+        <li>Coût de fabrication par jeu <b data-k="cout_par_jeu" data-fmt="eur">—</b></li>
+        <li>Prix moyen d'un jeu vendu <b data-k="prix_moyen_jeu" data-fmt="eur">—</b></li>
+        <li>Seuil de rentabilité <b id="k-seuil">—</b></li>
+      </ul>
+    </article>
+
+    <div class="grid2">
+      <article class="card flush">
+        <header class="card-h pad"><h2>Versements vers ton compte bancaire</h2>
+          <p class="note">Stripe vire automatiquement le solde disponible sur le RIB du compte.</p></header>
+        <div class="table-wrap">
+          <table class="tbl" id="tbl-versements">
+            <thead><tr><th>Arrivée prévue</th><th class="num">Montant</th><th>Statut</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="card flush">
+        <header class="card-h pad"><h2>Contestations de paiement</h2>
+          <p class="note">Quand un client conteste un paiement auprès de sa banque. On y répond dans Stripe, avant l'échéance.</p></header>
+        <div class="table-wrap">
+          <table class="tbl" id="tbl-contestations">
+            <thead><tr><th>Date</th><th>Client</th><th class="num">Montant</th><th class="hide-sm">Motif</th><th>Statut</th><th class="hide-sm">Échéance</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+
+    <div class="grid-side">
+      <article class="card">
+        <header class="card-h"><h2>Ajouter une dépense</h2>
+          <p class="note">Fabrication, transport, timbres, pub Instagram…</p></header>
+        <div class="form" id="form-dep">
+          <label>Date<input type="date" id="dep-date"></label>
+          <label>Catégorie<select id="dep-cat"></select></label>
+          <label>Montant (€)<input type="number" id="dep-montant" step="0.01" min="0"></label>
+          <label>Statut<select id="dep-statut"><option>Payée</option><option>À payer</option></select></label>
+          <label class="full">Note<input type="text" id="dep-note" placeholder="Ex. facture imprimeur, lot de cartons…"></label>
+          <p class="form-err" id="dep-err" hidden></p>
+          <button class="btn primary" type="button" id="dep-add">Ajouter la dépense</button>
+        </div>
+      </article>
+      <article class="card flush">
+        <header class="card-h pad"><h2>Dépenses</h2></header>
+        <div class="table-wrap">
+          <table class="tbl" id="tbl-dep">
+            <thead><tr><th>Date</th><th>Catégorie</th><th class="num">Montant</th><th>Statut</th><th class="hide-sm">Note</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<div class="tip" id="tip" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Fichiers jamais envoyés à Google Cloud lors du déploiement.
+.env
+.env.*
+data/
+.venv/
+__pycache__/
+*.tmp
+*.bak
+.gcloudignore
+deployer.ps1
+iap_settings*.yaml
+LISEZ-MOI*.md

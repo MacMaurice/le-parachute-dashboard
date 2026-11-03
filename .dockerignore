@@ -1,0 +1,12 @@
+# Fichiers exclus de l image Docker.
+.env
+.env.*
+data/
+.venv/
+__pycache__/
+*.tmp
+*.bak
+.gcloudignore
+deployer.ps1
+iap_settings*.yaml
+LISEZ-MOI*.md
