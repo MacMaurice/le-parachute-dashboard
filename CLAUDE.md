@@ -17,5 +17,5 @@ App FastAPI (`app.py`) + front statique (`static/`), déployée sur Cloud Run (p
 - Textes de l'interface en français, typo Sansation, couleurs `#1B476A` (marine) et `#F5CD2D` (jaune).
 
 ## Lancer en local
-`python app.py` (lit `.env`), puis http://localhost:8000.
+`python app.py` (lit `.env`), puis http://127.0.0.1:8037.
 Tests : `python -m pytest tests`.
