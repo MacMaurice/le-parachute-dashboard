@@ -5,7 +5,7 @@ App FastAPI (`app.py`) + front statique (`static/`), déployée sur Cloud Run (p
 ## Où on en est
 - **Ce dossier est l'unique version du dashboard.** Les anciennes copies sont dans `../_archives/` (lecture seule, ne plus y travailler).
 - Branches git :
-  - `main` = ce qui tourne sur Cloud Run (dernier déploiement connu : 2026-11-02).
+  - `main` = ce qui tourne sur Cloud Run (révision 00004, avec Instagram).
   - `dev` = travail en cours (Instagram, retouches). On travaille ici.
   - `carte` = carte des clients sur le plateau, pas encore fusionnée.
 - Après un déploiement depuis `dev` : `git checkout main && git merge dev`.
