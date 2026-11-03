@@ -1,0 +1,21 @@
+# Dashboard de ventes — Le Parachuté
+
+App FastAPI (`app.py`) + front statique (`static/`), déployée sur Cloud Run (projet GCP `le-parachute`, service `dashboard-ventes`, europe-west1, accès par IAP).
+
+## Où on en est
+- **Ce dossier est l'unique version du dashboard.** Les anciennes copies sont dans `../_archives/` (lecture seule, ne plus y travailler).
+- Branches git :
+  - `main` = ce qui tourne sur Cloud Run (dernier déploiement connu : 2026-11-02).
+  - `dev` = travail en cours (Instagram, retouches). On travaille ici.
+  - `carte` = carte des clients sur le plateau, pas encore fusionnée.
+- Après un déploiement depuis `dev` : `git checkout main && git merge dev`.
+
+## Règles
+- Ne pas modifier `main` directement : travailler sur `dev` (ou une branche dédiée). Git remplace les copies de dossiers et les fichiers `.bak`.
+- Déployer seulement quand Hugo le demande (`deployer.ps1`, PowerShell sur son PC).
+- Secrets dans `.env` (jamais commité). `data/` = données locales, ignorées par git.
+- Textes de l'interface en français, typo Sansation, couleurs `#1B476A` (marine) et `#F5CD2D` (jaune).
+
+## Lancer en local
+`python app.py` (lit `.env`), puis http://localhost:8000.
+Tests : `python -m pytest tests`.
