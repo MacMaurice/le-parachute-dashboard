@@ -1,0 +1,26 @@
+[
+  {
+    "id": "m1",
+    "date": null,
+    "type": "commande_imprimeur",
+    "quantite": 1000,
+    "montant": null,
+    "note": "Production en masse (Guang Zhou Yimi Paper, facture P20260930001), en transit par bateau de la Chine vers la France, arrivée prévue en décembre 2026"
+  },
+  {
+    "id": "m2",
+    "date": "2026-10-02",
+    "type": "commande_imprimeur",
+    "quantite": 3,
+    "montant": null,
+    "note": "3 premiers exemplaires"
+  },
+  {
+    "id": "m3",
+    "date": "2026-10-02",
+    "type": "reception",
+    "quantite": 3,
+    "montant": null,
+    "note": "3 premiers jeux reçus"
+  }
+]

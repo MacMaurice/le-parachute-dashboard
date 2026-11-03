@@ -10,3 +10,4 @@ __pycache__/
 deployer.ps1
 iap_settings*.yaml
 LISEZ-MOI*.md
+outils/

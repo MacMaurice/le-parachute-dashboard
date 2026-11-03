@@ -1,0 +1,34 @@
+[
+  {
+    "id": "d1",
+    "date": "2026-03-25",
+    "categorie": "Fabrication",
+    "montant": 4852.94,
+    "statut": "Payée",
+    "note": "Acompte n°1 à Guang Zhou Yimi Paper (facture P20260930001)"
+  },
+  {
+    "id": "d2",
+    "date": "2026-08-24",
+    "categorie": "Fabrication",
+    "montant": 1127.0,
+    "statut": "Payée",
+    "note": "Acompte n°2 à Guang Zhou Yimi Paper (facture P20260930001)"
+  },
+  {
+    "id": "d3",
+    "date": "2026-09-30",
+    "categorie": "Fabrication",
+    "montant": 5979.93,
+    "statut": "Payée",
+    "note": "Solde payé le 30/09/2026, facture P20260930001. Total 11 959,87 € : impression 1000 jeux 8 850 €, transport DDP par bateau jusqu'à Chambry 3 150 €, design 174 €, remise 3 % −214,13 €"
+  },
+  {
+    "id": "d4",
+    "date": "2026-09-18",
+    "categorie": "Frais divers",
+    "montant": 400.0,
+    "statut": "Payée",
+    "note": "Création de l'entreprise individuelle Frères MAURICE"
+  }
+]

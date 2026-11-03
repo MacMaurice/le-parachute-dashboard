@@ -7,7 +7,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py metrics.py store.py stripe_client.py ./
+COPY app.py metrics.py store.py stripe_client.py carte.py ./
+COPY geo ./geo
 COPY static ./static
 
 # Cloud Run fournit le port dans $PORT. Les données sont dans le bucket (GCS_BUCKET), la clé Stripe

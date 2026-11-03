@@ -234,6 +234,27 @@ input[type=text], input[type=number], input[type=date], input[type=search], sele
 @media (max-width: 700px) { .hide-sm { display: none; } .tile .big { font-size: 28px; } }
 
 /* --- Infobulle ------------------------------------------------------- */
+/* --- Carte électorale (plateau du jeu + points des commandes) ------------- */
+.carte-wrap { display: grid; grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .carte-wrap { grid-template-columns: 1fr; } }
+.plateau { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: #9FCBDD; }
+.plateau img { display: block; width: 100%; height: auto; }
+.plateau svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plateau .pt { cursor: pointer; transform-box: fill-box; transform-origin: 50% 100%; animation: atterrir .5s ease-out both; }
+.plateau .pt circle { fill: #1B476A; fill-opacity: .88; stroke: #FFFFFF; stroke-width: 1.2; }
+.plateau .pt.approx circle { stroke: #F5CD2D; stroke-dasharray: 2 1.5; }
+.plateau .pt:hover circle, .plateau .pt.on circle { fill: #F5CD2D; fill-opacity: 1; stroke: #1B476A; }
+.plateau .pt text { fill: #FFFFFF; font-family: var(--font); font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.plateau .pt:hover text, .plateau .pt.on text { fill: #1B476A; }
+@keyframes atterrir { from { opacity: 0; transform: translateY(-14px) scale(.6); } to { opacity: 1; transform: none; } }
+.carte-side h3 { margin: 18px 0 0; font-family: var(--font); font-size: 15px; }
+.carte-side .note { margin-bottom: 10px; }
+.carte-resume { margin: 0; font-size: 15px; }
+.carte-resume b { font-family: var(--font); font-size: 22px; }
+.carte-liste { list-style: none; margin: 6px 0 0; padding: 0; font-size: 14px; }
+.carte-liste li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+.carte-liste li b { font-variant-numeric: tabular-nums; }
+
 .tip { position: fixed; z-index: 50; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); padding: 8px 10px; font-size: 13px; max-width: 240px; }
 .tip .t { color: var(--muted); margin-bottom: 2px; }
 .tip i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 6px; }
