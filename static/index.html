@@ -35,33 +35,31 @@
 
   <!-- VUE D'ENSEMBLE -->
   <section id="apercu" class="page" data-page="apercu">
-    <p class="lede" id="lede">&nbsp;</p>
-
     <div class="tiles">
-      <article class="tile tile-main">
+      <article tabindex="0" class="tile tile-main">
         <h3>Jeux vendus</h3>
         <p class="big" data-k="jeux_vendus">—</p>
-        <p class="sub"><span data-k="part_tirage">—</span> du tirage</p><p class="sub"><span data-k="vendus_en_ligne">—</span> en ligne, <span data-k="vendus_direct">—</span> en direct</p>
+        <div class="tile-tip" role="tooltip"><p class="sub"><span data-k="part_tirage">—</span> du tirage</p><p class="sub"><span data-k="vendus_en_ligne">—</span> en ligne, <span data-k="vendus_direct">—</span> en direct</p></div>
       </article>
-      <article class="tile">
+      <article tabindex="0" class="tile">
         <h3>Chiffre d'affaires</h3>
         <p class="big" data-k="ca" data-fmt="eur">—</p>
-        <p class="sub">dont <span data-k="port" data-fmt="eur">—</span> de port</p><p class="sub">panier moyen <span data-k="panier_moyen" data-fmt="eur">—</span></p>
+        <div class="tile-tip" role="tooltip"><p class="sub">dont <span data-k="port" data-fmt="eur">—</span> de port</p><p class="sub">panier moyen <span data-k="panier_moyen" data-fmt="eur">—</span></p></div>
       </article>
-      <article class="tile">
+      <article tabindex="0" class="tile">
         <h3>Jeux à livrer</h3>
         <p class="big" data-k="a_livrer">—</p>
-        <p class="sub"><span data-k="a_preparer">—</span> à préparer</p><p class="sub"><span data-k="livres">—</span> déjà livrés</p>
+        <div class="tile-tip" role="tooltip"><p class="sub"><span data-k="a_preparer">—</span> à préparer</p><p class="sub"><span data-k="livres">—</span> déjà livrés</p></div>
       </article>
-      <article class="tile">
+      <article tabindex="0" class="tile">
         <h3>Disponibles à la vente</h3>
         <p class="big" data-k="disponibles">—</p>
-        <p class="sub">sur un tirage de <span data-k="tirage">—</span></p><p class="sub"><span data-k="recus">—</span> reçus, <span data-k="en_route">—</span> en route</p>
+        <div class="tile-tip" role="tooltip"><p class="sub">sur un tirage de <span data-k="tirage">—</span></p><p class="sub"><span data-k="recus">—</span> reçus, <span data-k="en_route">—</span> en route</p></div>
       </article>
-      <article class="tile">
+      <article tabindex="0" class="tile">
         <h3>Clients</h3>
         <p class="big" data-k="clients">—</p>
-        <p class="sub" id="k-cmd">—</p><p class="sub">conversion du lien <span id="k-conv">—</span></p>
+        <div class="tile-tip" role="tooltip"><p class="sub" id="k-cmd">—</p><p class="sub">conversion du lien <span id="k-conv">—</span></p></div>
       </article>
     </div>
 
@@ -157,11 +155,11 @@
   <!-- STOCK -->
   <section id="stock" class="page" data-page="stock" hidden>
     <div class="tiles">
-      <article class="tile"><h3>Tirage</h3><p class="big" data-k="tirage">—</p><p class="sub">jeux commandés à l'imprimeur</p></article>
-      <article class="tile"><h3>Reçus</h3><p class="big" data-k="recus">—</p><p class="sub"><span data-k="en_route">—</span> encore en route depuis l'imprimeur</p></article>
-      <article class="tile"><h3>Stock physique</h3><p class="big" data-k="stock_physique">—</p><p class="sub">jeux chez vous en ce moment</p></article>
-      <article class="tile"><h3>Disponibles à la vente</h3><p class="big" data-k="disponibles">—</p><p class="sub">tirage moins vendus, offerts, abîmés</p></article>
-      <article class="tile"><h3>Offerts</h3><p class="big" data-k="offerts">—</p><p class="sub"><span data-k="casse">—</span> abîmés ou perdus</p></article>
+      <article tabindex="0" class="tile"><h3>Tirage</h3><p class="big" data-k="tirage">—</p><div class="tile-tip" role="tooltip"><p class="sub">jeux commandés à l'imprimeur</p></div></article>
+      <article tabindex="0" class="tile"><h3>Reçus</h3><p class="big" data-k="recus">—</p><div class="tile-tip" role="tooltip"><p class="sub"><span data-k="en_route">—</span> encore en route depuis l'imprimeur</p></div></article>
+      <article tabindex="0" class="tile"><h3>Stock physique</h3><p class="big" data-k="stock_physique">—</p><div class="tile-tip" role="tooltip"><p class="sub">jeux chez vous en ce moment</p></div></article>
+      <article tabindex="0" class="tile"><h3>Disponibles à la vente</h3><p class="big" data-k="disponibles">—</p><div class="tile-tip" role="tooltip"><p class="sub">tirage moins vendus, offerts, abîmés</p></div></article>
+      <article tabindex="0" class="tile"><h3>Offerts</h3><p class="big" data-k="offerts">—</p><div class="tile-tip" role="tooltip"><p class="sub"><span data-k="casse">—</span> abîmés ou perdus</p></div></article>
     </div>
 
     <div class="grid-side">
@@ -193,13 +191,13 @@
   <!-- FINANCES -->
   <section id="finances" class="page" data-page="finances" hidden>
     <div class="tiles">
-      <article class="tile"><h3>Chiffre d'affaires</h3><p class="big" data-k="ca" data-fmt="eur">—</p>
-        <p class="sub"><span data-k="ca_en_ligne" data-fmt="eur">—</span> en ligne</p><p class="sub"><span data-k="ca_direct" data-fmt="eur">—</span> en direct</p></article>
-      <article class="tile"><h3>Frais Stripe</h3><p class="big" data-k="frais_stripe" data-fmt="eur">—</p><p class="sub">commissions et Radar</p></article>
-      <article class="tile"><h3>Dépenses</h3><p class="big" data-k="depenses" data-fmt="eur">—</p><p class="sub">dont <span data-k="depenses_a_payer" data-fmt="eur">—</span> à payer</p></article>
-      <article class="tile"><h3>Résultat</h3><p class="big" data-k="resultat" data-fmt="eur" data-sign="1">—</p><p class="sub">CA − frais Stripe − dépenses, payées ou à payer</p></article>
-      <article class="tile"><h3>Solde Stripe</h3><p class="big" data-k="solde_disponible" data-fmt="eur">—</p><p class="sub">+ <span data-k="solde_en_attente" data-fmt="eur">—</span> en attente chez Stripe</p></article>
-      <article class="tile"><h3>Versé sur ton compte</h3><p class="big" data-k="verse" data-fmt="eur">—</p><p class="sub">+ <span data-k="verse_en_cours" data-fmt="eur">—</span> en cours de virement</p></article>
+      <article tabindex="0" class="tile"><h3>Chiffre d'affaires</h3><p class="big" data-k="ca" data-fmt="eur">—</p>
+        <div class="tile-tip" role="tooltip"><p class="sub"><span data-k="ca_en_ligne" data-fmt="eur">—</span> en ligne</p><p class="sub"><span data-k="ca_direct" data-fmt="eur">—</span> en direct</p></div></article>
+      <article tabindex="0" class="tile"><h3>Frais Stripe</h3><p class="big" data-k="frais_stripe" data-fmt="eur">—</p><div class="tile-tip" role="tooltip"><p class="sub">commissions et Radar</p></div></article>
+      <article tabindex="0" class="tile"><h3>Dépenses</h3><p class="big" data-k="depenses" data-fmt="eur">—</p><div class="tile-tip" role="tooltip"><p class="sub">dont <span data-k="depenses_a_payer" data-fmt="eur">—</span> à payer</p></div></article>
+      <article tabindex="0" class="tile"><h3>Résultat</h3><p class="big" data-k="resultat" data-fmt="eur" data-sign="1">—</p><div class="tile-tip" role="tooltip"><p class="sub">CA − frais Stripe − dépenses, payées ou à payer</p></div></article>
+      <article tabindex="0" class="tile"><h3>Solde Stripe</h3><p class="big" data-k="solde_disponible" data-fmt="eur">—</p><div class="tile-tip" role="tooltip"><p class="sub">+ <span data-k="solde_en_attente" data-fmt="eur">—</span> en attente chez Stripe</p></div></article>
+      <article tabindex="0" class="tile"><h3>Versé sur ton compte</h3><p class="big" data-k="verse" data-fmt="eur">—</p><div class="tile-tip" role="tooltip"><p class="sub">+ <span data-k="verse_en_cours" data-fmt="eur">—</span> en cours de virement</p></div></article>
     </div>
 
     <article class="card" id="rentab">
@@ -270,11 +268,11 @@
     <div id="ig-alerte" class="banner warn" hidden></div>
     <div class="ig-profil" id="ig-profil" hidden></div>
     <div class="tiles">
-      <article class="tile tile-main"><h3>Abonnés</h3><p class="big" id="ig-abonnes">—</p><p class="sub" id="ig-abonnes-7j">—</p></article>
-      <article class="tile"><h3>Portée</h3><p class="big" id="ig-portee">—</p><p class="sub">comptes touchés, 7 derniers jours</p></article>
-      <article class="tile"><h3>Interactions</h3><p class="big" id="ig-inter">—</p><p class="sub">j'aime, commentaires, partages, enregistrements (7 j)</p></article>
-      <article class="tile"><h3>Clics vers le lien du profil</h3><p class="big" id="ig-clics">—</p><p class="sub">7 derniers jours</p></article>
-      <article class="tile"><h3>Clients venus d'Instagram</h3><p class="big" id="ig-clients">—</p><p class="sub" id="ig-clients-sub">—</p></article>
+      <article tabindex="0" class="tile tile-main"><h3>Abonnés</h3><p class="big" id="ig-abonnes">—</p><div class="tile-tip" role="tooltip"><p class="sub" id="ig-abonnes-7j">—</p></div></article>
+      <article tabindex="0" class="tile"><h3>Portée</h3><p class="big" id="ig-portee">—</p><div class="tile-tip" role="tooltip"><p class="sub">comptes touchés, 7 derniers jours</p></div></article>
+      <article tabindex="0" class="tile"><h3>Interactions</h3><p class="big" id="ig-inter">—</p><div class="tile-tip" role="tooltip"><p class="sub">j'aime, commentaires, partages, enregistrements (7 j)</p></div></article>
+      <article tabindex="0" class="tile"><h3>Clics vers le lien du profil</h3><p class="big" id="ig-clics">—</p><div class="tile-tip" role="tooltip"><p class="sub">7 derniers jours</p></div></article>
+      <article tabindex="0" class="tile"><h3>Clients venus d'Instagram</h3><p class="big" id="ig-clients">—</p><div class="tile-tip" role="tooltip"><p class="sub" id="ig-clients-sub">—</p></div></article>
     </div>
 
     <article class="card">

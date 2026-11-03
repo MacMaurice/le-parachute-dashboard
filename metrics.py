@@ -353,8 +353,6 @@ def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[
         alertes.append({"niveau": "bad", "texte": "Tirage épuisé : pense à désactiver le lien de paiement Stripe."})
     elif tirage and disponibles <= SEUIL_STOCK_BAS:
         alertes.append({"niveau": "warn", "texte": f"Plus que {disponibles} jeux disponibles à la vente."})
-    if a_preparer:
-        alertes.append({"niveau": "warn", "texte": f"{a_preparer} jeu{'x' if a_preparer > 1 else ''} à préparer pour l'envoi ou la remise."})
     if stock_physique < 0 and recus:
         alertes.append({"niveau": "bad", "texte": "Le stock physique calculé est négatif : vérifie le journal du stock."})
     for l in links:

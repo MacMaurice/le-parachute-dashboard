@@ -106,13 +106,6 @@
     $("#alertes").replaceChildren(...d.alertes.map((a) => h("li", { class: a.niveau }, a.texte,
       a.commande ? h("button", { type: "button", class: "alert-link", onclick: () => voirCommande(a.commande) }, "Voir la commande") : null)));
 
-    const lede = $("#lede");
-    lede.replaceChildren(
-      h("b", {}, plural(k.jeux_vendus, "jeu vendu", "jeux vendus")),
-      k.tirage ? ` sur un tirage de ${nf.format(k.tirage)}, ` : ", ",
-      h("b", {}, eur.format(k.ca)), " encaissés. ",
-      k.a_livrer === 1 ? "1 jeu attend d'être livré." : k.a_livrer > 1 ? `${nf.format(k.a_livrer)} jeux attendent d'être livrés.` : "Aucun jeu en attente de livraison.");
-
     renderGauge(k);
     renderVentes(d.serie);
     renderFunnel(d.funnel);
