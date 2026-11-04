@@ -296,6 +296,18 @@
       }));
     }
 
+    // Téléphone : la carte déborde, on la centre une fois sur la zone qui a le plus de jeux
+    const sc = $("#plateau-scroll");
+    if (sc && !sc.dataset.centre && c.points.length && sc.scrollWidth > sc.clientWidth + 4) {
+      const parFief = {};
+      c.points.forEach((p) => { parFief[p.fief] = (parFief[p.fief] || 0) + p.jeux; });
+      const fief = Object.keys(parFief).reduce((a, f) => (parFief[f] > parFief[a] ? f : a));
+      const zone = c.points.filter((p) => p.fief === fief);
+      const x = zone.reduce((a, p) => a + p.x * p.jeux, 0) / parFief[fief];
+      sc.scrollLeft = x / c.largeur * sc.scrollWidth - sc.clientWidth / 2;
+      sc.dataset.centre = "1";
+    }
+
     const jeuxCarte = c.points.reduce((a, p) => a + p.jeux, 0);
     const jeuxHors = c.hors_plateau.reduce((a, h) => a + h.jeux, 0);
     const deps = new Set(c.points.flatMap((p) => p.cp.map((cp) => cp.slice(0, 2))));

@@ -244,6 +244,13 @@ input[type=text], input[type=number], input[type=date], input[type=search], sele
 /* --- Carte électorale (plateau du jeu + points des commandes) ------------- */
 .carte-wrap { display: grid; grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr); gap: 24px; align-items: start; }
 @media (max-width: 900px) { .carte-wrap { grid-template-columns: 1fr; } }
+.only-sm { display: none; }
+/* Sur téléphone, la carte garde une taille lisible et se parcourt en la faisant glisser */
+@media (max-width: 700px) {
+  .plateau-scroll { overflow-x: auto; margin: 0 -20px; padding: 0 20px 4px; scrollbar-width: thin; }
+  .plateau-scroll .plateau { width: 720px; }
+  .only-sm { display: block; margin-top: 6px; text-align: center; }
+}
 .plateau { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: #9FCBDD; }
 .plateau img { display: block; width: 100%; height: auto; }
 .plateau svg { position: absolute; inset: 0; width: 100%; height: 100%; }
