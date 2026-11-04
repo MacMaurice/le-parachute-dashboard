@@ -110,6 +110,7 @@
     renderVentes(d.serie);
     renderFunnel(d.funnel);
     renderFiltre(d.funnel);
+    renderCarte(d.carte);
     renderBars("#bars-livraison", d.livraison, "Aucune vente en ligne pour l'instant.");
     renderBars("#bars-sources", d.sources, "Aucune réponse pour l'instant.");
     renderMots(d.commandes);
@@ -258,6 +259,65 @@
       el.addEventListener("mouseleave", hideTip);
       return el;
     }));
+  }
+
+  // ---------- Carte électorale ----------
+  function renderCarte(c) {
+    const svg = $("#plateau-points"), side = $("#carte-hors"), resume = $("#carte-resume");
+    if (!c || c.erreur) {
+      svg.replaceChildren();
+      resume.textContent = c && c.erreur ? c.erreur : "Carte indisponible.";
+      $("#bars-fiefs").replaceChildren(); side.replaceChildren();
+      return;
+    }
+    // Rayon mini de 6 pixels à l'écran, pour que les points restent visibles sur téléphone
+    const ech = c.largeur / (svg.getBoundingClientRect().width || c.largeur);
+    const rMin = Math.round(6 * ech * 10) / 10;
+    const sig = JSON.stringify([rMin, c.points.map((p) => [p.commune, p.x, p.y, p.jeux])]);
+    if (svg.dataset.sig !== sig) {  // ne redessine (et ne relance l'animation) que si les points changent
+      svg.dataset.sig = sig;
+      const pts = [...c.points].sort((a, b) => b.jeux - a.jeux);  // les gros points dessous
+      svg.replaceChildren(...pts.map((p, i) => {
+        const r = Math.max(rMin, 3.2 + 2.1 * Math.sqrt(p.jeux));
+        const g = s("g", { class: `pt${p.approx ? " approx" : ""}`, style: `animation-delay:${Math.min(i * 40, 1200)}ms`, tabindex: "0" });
+        g.append(s("circle", { cx: p.x, cy: p.y, r }));
+        if (p.jeux > 1) { const t = s("text", { x: p.x, y: p.y, style: `font-size:${Math.max(7, r * 1.1)}px` }); t.textContent = p.jeux; g.append(t); }
+        const lignes = [[null, "Jeux", nf.format(p.jeux)], [null, "Commandes", nf.format(p.commandes)], [null, "Fief", p.fief]];
+        if (p.approx) lignes.push([null, "Position", "approximative (département)"]);
+        const titre = `${p.commune}${p.cp.length === 1 ? ` (${p.cp[0]})` : ""}`;
+        const voir = (e) => { $$(".plateau .pt.on").forEach((x) => x.classList.remove("on")); g.classList.add("on"); showTip(e, titre, lignes); };
+        const cacher = () => { g.classList.remove("on"); hideTip(); };
+        g.addEventListener("pointermove", voir);
+        g.addEventListener("pointerleave", cacher);
+        g.addEventListener("click", voir);
+        g.addEventListener("focus", () => { const b = g.getBoundingClientRect(); voir({ clientX: b.right, clientY: b.top }); });
+        g.addEventListener("blur", cacher);
+        return g;
+      }));
+    }
+
+    const jeuxCarte = c.points.reduce((a, p) => a + p.jeux, 0);
+    const jeuxHors = c.hors_plateau.reduce((a, h) => a + h.jeux, 0);
+    const deps = new Set(c.points.flatMap((p) => p.cp.map((cp) => cp.slice(0, 2))));
+    if (!c.points.length && !jeuxHors) {
+      resume.textContent = c.sans_adresse ? "Pas encore d'adresse à placer sur la carte." : "Aucune commande pour l'instant : les points apparaîtront ici.";
+    } else {
+      resume.replaceChildren(h("b", {}, nf.format(c.points.length)), ` commune${c.points.length > 1 ? "s" : ""}`,
+        h("br"), `${plural(deps.size, "département", "départements")}, ${plural(jeuxCarte, "jeu", "jeux")} sur la carte`);
+    }
+    renderBars("#bars-fiefs", c.fiefs.slice(0, 6).map((f) => ({ label: f.ville, n: f.jeux })), "Aucun fief pour l'instant.");
+
+    const blocs = [];
+    if (c.hors_plateau.length) {
+      blocs.push(h("h3", {}, "Hors du plateau"),
+        h("p", { class: "note" }, "Corse, outre-mer et étranger : la carte du jeu ne les montre pas."),
+        h("ul", { class: "carte-liste" }, c.hors_plateau.map((x) => h("li", {}, x.label, h("b", {}, plural(x.jeux, "jeu", "jeux"))))));
+    }
+    if (c.sans_adresse) {
+      blocs.push(h("p", { class: "note", style: "margin-top:14px" },
+        `${plural(c.sans_adresse, "jeu commandé", "jeux commandés")} sans code postal (retrait en main propre, en général) : pas de point sur la carte.`));
+    }
+    side.replaceChildren(...blocs);
   }
 
   function renderMots(cmds) {
@@ -514,8 +574,8 @@
     renderIgHeures(ig);
     renderIgCommentaires(ig);
     const maj = ig.derniere_collecte ? new Date(ig.derniere_collecte) : null;
-    $("#ig-maj").textContent = maj ? `Instagram collecté le ${dLong.format(maj)} à ${tHM.format(maj)} (deux fois par jour, vers 11 h et 23 h). Les chiffres récents se complètent dans les 48 h.`
-      : "La collecte Instagram tourne deux fois par jour, vers 11 h et 23 h.";
+    $("#ig-maj").textContent = maj ? `Instagram collecté le ${dLong.format(maj)} à ${tHM.format(maj)} (4 fois par jour : 8 h, 13 h, 19 h et 23 h). Les chiffres récents se complètent dans les 48 h.`
+      : "La collecte Instagram tourne 4 fois par jour : 8 h, 13 h, 19 h et 23 h.";
   }
 
   function renderIgCharts(ig) {
@@ -665,14 +725,14 @@
     const tab = $$(".page").some((p) => p.dataset.page === name) ? name : "apercu";
     $$(".page").forEach((p) => (p.hidden = p.dataset.page !== tab));
     $$(".tabs a").forEach((a) => a.setAttribute("aria-selected", String(a.dataset.tab === tab)));
-    if (tab === "apercu" && state.data) renderVentes(state.data.serie);
+    if (tab === "apercu" && state.data) { renderVentes(state.data.serie); renderCarte(state.data.carte); }
     if (tab === "instagram" && state.data && state.data.instagram) renderIgCharts(state.data.instagram);
   }
   // Les onglets sont des ancres (#apercu…) : le navigateur descendrait jusqu'à la section
   // et cacherait les alertes du haut. On reste en haut de page.
   addEventListener("hashchange", () => { showTab(); scrollTo(0, 0); });
   let rt;
-  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!state.data) return; renderVentes(state.data.serie); if (state.data.instagram) renderIgCharts(state.data.instagram); }, 150); });
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!state.data) return; renderVentes(state.data.serie); renderCarte(state.data.carte); if (state.data.instagram) renderIgCharts(state.data.instagram); }, 150); });
 
   $("#refresh").addEventListener("click", () => load(true));
   showTab();

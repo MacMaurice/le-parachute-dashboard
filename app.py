@@ -24,12 +24,20 @@ ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 STATIC = ROOT / "static"
-store = Store.from_env(ROOT)  # dossier data/ en local, bucket GCS si GCS_BUCKET est renseigné
+DEMO = os.getenv("DEMO", "").strip() in ("1", "true", "oui")
+if DEMO:  # données fictives, ni Stripe ni bucket (voir demo.py)
+    import demo
+    store = Store(demo.dossier_donnees())
+    _stripe_demo = demo.FakeStripe()
+else:
+    store = Store.from_env(ROOT)  # dossier data/ en local, bucket GCS si GCS_BUCKET est renseigné
 _stripe: StripeClient | None = None
 
 
 def stripe() -> StripeClient:
     global _stripe
+    if DEMO:
+        return _stripe_demo
     if _stripe is None:
         key = os.getenv("STRIPE_API_KEY", "").strip()
         if not key or "xxx" in key:

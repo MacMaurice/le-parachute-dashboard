@@ -16,3 +16,4 @@ installer-instagram.ps1
 .gitignore
 *.bak
 CLAUDE.md
+outils/

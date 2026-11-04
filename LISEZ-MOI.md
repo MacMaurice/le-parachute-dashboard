@@ -89,6 +89,9 @@ Ces filtres ne touchent que le taux de conversion : une vraie commande payée re
 app.py              serveur FastAPI (API + page), à lancer avec python app.py
 stripe_client.py    lecture de l'API Stripe, cache 60 s
 metrics.py          calcul des indicateurs
+carte.py            carte électorale : place chaque commande sur la France du plateau
+geo/                codes postaux déjà positionnés sur le plateau, calage sur les 25 villes
+outils/             construire_carte.py, qui régénère geo/ et l'image (pas déployé)
 store.py            lecture/écriture des fichiers data/*.json (ou du bucket GCS en ligne)
 static/             page HTML, CSS, JS, logo et police Sansation
 data/               données saisies à la main
@@ -105,3 +108,24 @@ filtre « Doublons possibles » et badge « Doublon ? » dans l'onglet Commandes
 
 - si c'est un doublon, la rembourser dans Stripe : elle passe en « Remboursée » et l'alerte disparaît ;
 - si le client voulait bien deux commandes, cliquer « Pas un doublon, garder les deux » (réversible).
+
+## La carte électorale
+
+Dans la vue d'ensemble, chaque commune où un jeu a été commandé apparaît sur la France du plateau
+(image `static/img/carte-plateau.webp`, recadrée depuis `2 - Design/plateau/plateau.png`).
+
+- La position vient du code postal de livraison, et de la ville pour choisir parmi les communes
+  qui partagent ce code. Tout est calculé localement à partir de `geo/` : aucune adresse n'est
+  envoyée à un service extérieur.
+- La France du plateau est dessinée à la main. Le calage la fait coïncider exactement avec les
+  25 villes du jeu : une commande à Lyon tombe sur le pion de Lyon, une commande à Meaux juste à
+  côté de Paris. Les communes du littoral tombées dans la mer dessinée sont ramenées à terre.
+- Point en pointillé jaune : code postal inconnu (CEDEX, code très récent), placé au centre du
+  département.
+- Les « fiefs » rangent les acheteurs par ville du plateau la plus proche.
+- La Corse (cachée sous les pistes de popularité du plateau), l'outre-mer et l'étranger sont
+  listés à côté de la carte. Les commandes sans code postal (retrait en main propre) sont comptées
+  à part.
+- Si le plateau change, relancer `outils/construire_carte.py` (les sources ouvertes à télécharger
+  sont indiquées en tête du script).
+

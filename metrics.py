@@ -8,6 +8,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 import instagram
+import carte as carte_plateau
 
 PARIS = ZoneInfo("Europe/Paris")
 
@@ -151,6 +152,7 @@ def _orders(snap: dict, suivi: list[dict], stock_recu: bool) -> list[dict]:
             "adresse": ", ".join(x for x in [addr.get("line1"), addr.get("line2")] if x),
             "code_postal": addr.get("postal_code") or "",
             "ville": addr.get("city") or "",
+            "pays": addr.get("country") or "",
             "quantite": qty,
             "livraison": livraison,
             "montant": total / 100,
@@ -347,6 +349,12 @@ def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[
         livraison[o["livraison"]] += o["quantite"]
         sources[o["source"]] += 1
 
+    # Carte des commandes sur le plateau (un souci de géolocalisation ne doit pas bloquer le reste)
+    try:
+        carte_cmd = carte_plateau.construire(actives)
+    except Exception as exc:  # noqa: BLE001
+        carte_cmd = {"erreur": f"Carte indisponible : {exc}"}
+
     links = snap.get("payment_links") or []
     alertes = []
     if tirage and disponibles <= 0:
@@ -427,6 +435,7 @@ def build(snap: dict, mouvements: list[dict], suivi: list[dict], depenses: list[
         "funnel": funnel,
         "livraison": [{"label": k, "n": v} for k, v in livraison.most_common()],
         "sources": [{"label": k, "n": v} for k, v in sources.most_common()],
+        "carte": carte_cmd,
         "commandes": orders,
         "mouvements": sorted(mouvements, key=lambda m: str(m.get("date") or ""), reverse=True),
         "versements": versements,

@@ -1,4 +1,4 @@
-"""Collecte Instagram du Parachuté, lancée à 11 h et 23 h sur Google Cloud (Cloud Run Job).
+"""Collecte Instagram du Parachuté, lancée à 8 h, 13 h, 19 h et 23 h sur Google Cloud (Cloud Run Job).
 
     python collecte_ig.py            # renouvelle le jeton si besoin, puis collecte
     python collecte_ig.py --jeton    # renouvellement du jeton seulement

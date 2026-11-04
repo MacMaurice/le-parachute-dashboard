@@ -1,4 +1,4 @@
-"""Onglet Instagram du dashboard : données collectées chaque soir (collecte_ig.py) croisées avec Stripe."""
+"""Onglet Instagram du dashboard : données collectées 4 fois par jour (collecte_ig.py) croisées avec Stripe."""
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta

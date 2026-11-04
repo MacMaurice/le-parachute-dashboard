@@ -7,7 +7,7 @@ App FastAPI (`app.py`) + front statique (`static/`), déployée sur Cloud Run (p
 - Branches git :
   - `main` = ce qui tourne sur Cloud Run (révision 00004, avec Instagram).
   - `dev` = travail en cours (Instagram, retouches). On travaille ici.
-  - `carte` = carte des clients sur le plateau, pas encore fusionnée.
+  - `carte` = ancienne branche de la carte électorale, fusionnée dans `dev` le 04/11 (gardée pour l'historique).
 - Après un déploiement depuis `dev` : `git checkout main && git merge dev`.
 
 ## Règles
@@ -19,3 +19,6 @@ App FastAPI (`app.py`) + front statique (`static/`), déployée sur Cloud Run (p
 ## Lancer en local
 `python app.py` (lit `.env`), puis http://127.0.0.1:8037.
 Tests : `python -m pytest tests`.
+
+## Mode démo (sans Stripe ni Google Cloud)
+`DEMO=1 python app.py` (PowerShell : `$env:DEMO="1"; python app.py`). Données fictives générées par `demo.py`, écrites dans un dossier temporaire : rien ne touche aux vraies données. À utiliser pour vérifier une modification (capture Playwright) avant de la montrer ou de la déployer.
